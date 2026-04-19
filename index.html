@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PDA Stack Simulator</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Outfit:wght@300;400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-bg" aria-hidden="true">
+    <div class="bg-circle c1"></div>
+    <div class="bg-circle c2"></div>
+    <div class="bg-circle c3"></div>
+  </div>
+
+  <div class="app-shell">
+
+    <!-- ═══════════ HEADER ═══════════ -->
+    <header class="site-header">
+      <div class="header-logo">
+        <span class="logo-icon">⟨</span>
+        <span class="logo-text">PDA</span>
+        <span class="logo-icon">⟩</span>
+      </div>
+      <div class="header-title-block">
+        <h1 class="site-title">Pushdown Automata</h1>
+        <p class="site-subtitle">Stack Simulator &amp; Step Visualizer</p>
+      </div>
+      <div class="header-badge">
+        <span class="badge-dot"></span>
+        Interactive
+      </div>
+    </header>
+
+    <!-- ═══════════ MAIN LAYOUT ═══════════ -->
+    <main class="main-grid">
+
+      <!-- ═══ LEFT COLUMN ═══ -->
+      <div class="col-left">
+
+        <!-- Input String Visualization -->
+        <section class="card" id="stringCard">
+          <div class="card-header">
+            <span class="card-icon">⊢</span>
+            <h2 class="card-title">Input Tape</h2>
+            <span class="card-tag" id="tapeStatus">Ready</span>
+          </div>
+          <div class="tape-container" id="tapeContainer">
+            <div class="tape-empty-msg" id="tapeEmptyMsg">Enter a string to begin simulation</div>
+            <div class="tape-track" id="tapeTrack"></div>
+            <div class="tape-progress-bar">
+              <div class="tape-progress-fill" id="tapeProgressFill"></div>
+            </div>
+            <div class="tape-stats" id="tapeStats"></div>
+          </div>
+        </section>
+
+        <!-- Stack Visualization -->
+        <section class="card" id="stackCard">
+          <div class="card-header">
+            <span class="card-icon">⊕</span>
+            <h2 class="card-title">Stack Memory</h2>
+            <div class="stack-meta" id="stackMeta">
+              <span class="stack-depth-label">Depth:</span>
+              <span class="stack-depth-val" id="stackDepth">0</span>
+            </div>
+          </div>
+
+          <div class="stack-arena">
+            <!-- Stack visual -->
+            <div class="stack-container">
+              <div class="stack-top-label" id="stackTopLabel">
+                <span class="top-arrow">▲</span> TOP
+              </div>
+              <div class="stack-body" id="stackBody">
+                <div class="stack-empty-state" id="stackEmptyState">
+                  <div class="empty-icon">◻</div>
+                  <span>Stack is empty</span>
+                </div>
+              </div>
+              <div class="stack-bottom">
+                <div class="stack-bottom-bar"></div>
+                <span class="stack-bottom-label">BOTTOM</span>
+              </div>
+            </div>
+
+            <!-- Stack side panel -->
+            <div class="stack-side">
+              <div class="stack-info-box" id="lastOpBox">
+                <div class="info-box-label">Last Operation</div>
+                <div class="info-box-val" id="lastOpVal">—</div>
+              </div>
+              <div class="stack-info-box" id="topSymBox">
+                <div class="info-box-label">Top Symbol</div>
+                <div class="info-box-val" id="topSymVal">—</div>
+              </div>
+              <div class="stack-info-box">
+                <div class="info-box-label">Current Phase</div>
+                <div class="info-box-val" id="phaseVal">—</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- State Diagram -->
+        <section class="card" id="stateCard">
+          <div class="card-header">
+            <span class="card-icon">⬠</span>
+            <h2 class="card-title">State Diagram</h2>
+          </div>
+          <div class="diagram-viewport">
+            <div class="state-diagram" id="stateDiagram">
+              <!-- Alternating nodes and transition arrows -->
+              <div class="state-node" id="node-q0">q₀</div>
+              <div class="trans-arrow" id="arrow-q0q1"></div>
+              <div class="state-node" id="node-q1">q₁</div>
+              <div class="trans-arrow" id="arrow-q1q2"></div>
+              <div class="state-node" id="node-q2">q₂</div>
+              
+              <!-- Self-loops (absolutely positioned) -->
+              <div class="self-loop" id="loop-q0"></div>
+              <div class="self-loop" id="loop-q1"></div>
+              <div class="self-loop" id="loop-q2"></div>
+            </div>
+            <div class="diagram-labels">
+              <span class="label-q0">Read a: PUSH A</span>
+              <span class="label-q1">Read b: POP A / SWAP B</span>
+              <span class="label-q2">Read c: POP B</span>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /col-left -->
+
+      <!-- ═══ RIGHT COLUMN ═══ -->
+      <div class="col-right">
+
+        <!-- Controls -->
+        <section class="card" id="controlCard">
+          <div class="card-header">
+            <span class="card-icon">◈</span>
+            <h2 class="card-title">Controls</h2>
+          </div>
+
+          <div class="control-field">
+            <label class="field-label" for="langSelect">Language</label>
+            <div class="select-wrap">
+              <select id="langSelect">
+                <option value="anbn">aⁿbⁿ — equal a's and b's</option>
+                <option value="anbncn">aⁿbⁿcⁿ — equal a's, b's, c's</option>
+              </select>
+              <span class="select-icon">▾</span>
+            </div>
+          </div>
+
+          <div class="control-field">
+            <label class="field-label" for="inputString">Input String</label>
+            <div class="input-wrap">
+              <input
+                type="text"
+                id="inputString"
+                placeholder="e.g. aaabbb"
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <button class="input-clear-btn" id="inputClearBtn" title="Clear" onclick="clearInput()">✕</button>
+            </div>
+            <div class="field-hint" id="fieldHint">Only characters a, b (and c for aⁿbⁿcⁿ) allowed</div>
+          </div>
+
+          <div class="btn-group">
+            <button class="btn btn-run" id="btnRun" onclick="runSimulation()">
+              <span class="btn-icon">▶</span>
+              <span>Run All</span>
+            </button>
+            <button class="btn btn-step" id="btnStep" onclick="stepForward()" disabled>
+              <span class="btn-icon">→</span>
+              <span>Step</span>
+            </button>
+            <button class="btn btn-reset" id="btnReset" onclick="resetSimulation()">
+              <span class="btn-icon">↺</span>
+              <span>Reset</span>
+            </button>
+          </div>
+
+          <!-- Speed control -->
+          <div class="speed-control">
+            <label class="field-label">Auto-run Speed</label>
+            <div class="speed-row">
+              <span class="speed-label">Slow</span>
+              <input type="range" id="speedSlider" min="100" max="1200" value="600" step="100" class="speed-slider"/>
+              <span class="speed-label">Fast</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Transition Log -->
+        <section class="card" id="logCard">
+          <div class="card-header">
+            <span class="card-icon">≡</span>
+            <h2 class="card-title">Transition Log</h2>
+            <button class="log-clear-btn" onclick="clearLog()" title="Clear log">Clear</button>
+          </div>
+          <div class="log-body" id="logBody">
+            <div class="log-empty" id="logEmpty">
+              <span class="log-empty-icon">◌</span>
+              <span>No transitions yet</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Formal Definition -->
+        <section class="card" id="formalCard">
+          <div class="card-header">
+            <span class="card-icon">δ</span>
+            <h2 class="card-title">Formal Definition</h2>
+          </div>
+          <div class="formal-body" id="formalBody">
+             <div class="formal-placeholder">Select language to see rules</div>
+          </div>
+        </section>
+
+        <!-- Result Panel -->
+        <section class="card result-card" id="resultCard">
+          <div class="card-header">
+            <span class="card-icon">◎</span>
+            <h2 class="card-title">Result</h2>
+          </div>
+          <div class="result-body" id="resultBody">
+            <div class="result-placeholder">
+              <div class="result-placeholder-icon">○</div>
+              <span>Awaiting simulation…</span>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /col-right -->
+    </main><!-- /main-grid -->
+
+    <!-- Step indicator bar -->
+    <div class="step-bar" id="stepBar">
+      <div class="step-bar-inner">
+        <span class="step-counter" id="stepCounter">Step 0 / 0</span>
+        <div class="step-track">
+          <div class="step-fill" id="stepFill"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /app-shell -->
+
+  <script src="script.js"></script>
+</body>
+</html>
